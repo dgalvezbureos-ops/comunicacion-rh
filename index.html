@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Muro del equipo</title>
+<style>
+:root{--bg:#f0f2f5;--card:#fff;--ink:#050505;--mute:#65676b;--hover:#e4e6eb;--line:#ced0d4;--blue:#1877f2;--blue-soft:#e7f3ff;--red:#f02849;--shadow:0 1px 2px rgba(0,0,0,.2)}
+@media(prefers-color-scheme:dark){:root{--bg:#18191a;--card:#242526;--ink:#e4e6eb;--mute:#b0b3b8;--hover:#3a3b3c;--line:#3e4042;--blue:#2d88ff;--blue-soft:#263951;--shadow:0 1px 2px rgba(0,0,0,.6)}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.35 system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;padding-top:56px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+/* barra superior */
+.top{position:fixed;top:0;left:0;right:0;height:56px;background:var(--card);box-shadow:var(--shadow);display:flex;align-items:center;padding:0 12px;gap:8px;z-index:20}
+.logo{width:40px;height:40px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;font-size:1.1rem;display:grid;place-items:center;flex:none}
+.search{background:var(--bg);border:0;border-radius:999px;padding:9px 14px;width:240px;max-width:40vw}
+.nav{flex:1;display:flex;justify-content:center;gap:4px}
+.nav button{width:100px;max-width:18vw;height:48px;border:0;border-bottom:3px solid transparent;background:transparent;border-radius:8px 8px 0 0;font-size:1.35rem;color:var(--mute)}
+.nav button:hover{background:var(--hover)}
+.nav button[aria-pressed=true]{border-bottom-color:var(--blue);color:var(--blue)}
+.right{display:flex;align-items:center;gap:8px}
+.pill{border:0;background:var(--hover);border-radius:999px;padding:9px 14px;font-weight:600;white-space:nowrap}
+.pill.on{background:var(--blue);color:#fff}
+.me{width:40px;height:40px;border-radius:50%;background:#7a3fd1;color:#fff;font-weight:700;display:grid;place-items:center}
+/* columnas */
+.layout{display:grid;grid-template-columns:280px minmax(0,680px) 300px;justify-content:space-between;gap:16px;padding:16px;max-width:1400px;margin:auto}
+aside{position:sticky;top:72px;align-self:start}
+.menu button{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;padding:8px;border-radius:8px;font-weight:500;text-align:left}
+.menu button:hover{background:var(--hover)}
+.menu button[aria-pressed=true]{background:var(--blue-soft);color:var(--blue)}
+.ico{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:1.1rem;background:var(--c);flex:none}
+.card{background:var(--card);border-radius:8px;box-shadow:var(--shadow);margin-bottom:16px}
+.pad{padding:12px 16px}
+h3{margin:0 0 8px;font-size:1.05rem;color:var(--mute);font-weight:600}
+.mini{display:flex;gap:10px;align-items:center;padding:6px 0}
+.mini small{color:var(--mute);display:block}
+/* crear publicación */
+.compose{display:none;padding:12px 16px}.rh .compose{display:block}
+.compose .r{display:flex;gap:10px;align-items:center}
+.fake{flex:1;text-align:left;border:0;background:var(--bg);border-radius:999px;padding:10px 14px;color:var(--mute)}
+.fake:hover{background:var(--hover)}
+.compose hr,.act{border:0;border-top:1px solid var(--line);margin:10px 0 0}
+.shortcuts{display:flex;padding-top:8px}
+.shortcuts button{flex:1;border:0;background:transparent;border-radius:8px;padding:8px;font-weight:600;color:var(--mute)}
+.shortcuts button:hover{background:var(--hover)}
+/* publicación */
+.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;background:var(--c);flex:none}
+.ph{display:flex;gap:10px;align-items:center;padding:12px 16px 0}
+.ph .w{flex:1;min-width:0}.ph b{display:block;font-size:.95rem}.ph small{color:var(--mute);font-size:.8rem}
+.dots{display:none;border:0;background:transparent;border-radius:50%;width:36px;height:36px;font-size:1.2rem;color:var(--mute)}
+.rh .dots{display:block}.dots:hover{background:var(--hover)}
+.pt{padding:10px 16px 0;white-space:pre-wrap;word-break:break-word}
+.pt strong{display:block;font-size:1.05rem;margin-bottom:2px}
+.big{margin:12px 0 0;padding:34px 16px;text-align:center;color:#fff;font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,var(--g1),var(--g2))}
+.big span{display:block;font-size:3.2rem}
+.media{width:100%;display:block;margin-top:12px;background:#000;max-height:640px;object-fit:contain}
+iframe.media{aspect-ratio:16/9;border:0}
+.stats{display:flex;justify-content:space-between;padding:10px 16px;color:var(--mute);font-size:.9rem}
+.stats .lk{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--blue);color:#fff;font-size:.65rem;margin-right:5px}
+.act{display:flex;margin:0 16px;padding:4px 0}
+.act button{flex:1;border:0;background:transparent;border-radius:6px;padding:8px;font-weight:600;color:var(--mute)}
+.act button:hover{background:var(--hover)}
+.act button.liked{color:var(--blue)}
+.coms{padding:4px 16px 12px}
+.com{display:flex;gap:8px;margin-top:8px}
+.com .av{width:32px;height:32px;font-size:.8rem}
+.bub{background:var(--bg);border-radius:18px;padding:8px 12px}.bub b{font-size:.85rem;display:block}
+.ci{display:flex;gap:8px;margin-top:10px}
+.ci input{flex:1;border:0;background:var(--bg);border-radius:999px;padding:9px 14px}
+.empty{text-align:center;color:var(--mute);padding:40px 0}
+/* modal */
+dialog{border:0;border-radius:10px;padding:0;width:min(500px,94vw);background:var(--card);color:var(--ink);box-shadow:0 12px 28px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(255,255,255,.7)}
+@media(prefers-color-scheme:dark){dialog::backdrop{background:rgba(0,0,0,.6)}}
+.mh{display:flex;align-items:center;justify-content:center;position:relative;padding:16px;border-bottom:1px solid var(--line);font-weight:800;font-size:1.2rem}
+.mh button{position:absolute;right:12px;border:0;background:var(--hover);border-radius:50%;width:36px;height:36px}
+.mb{padding:16px;display:grid;gap:10px}
+.mb input,.mb select,.mb textarea{width:100%;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:10px}
+.mb textarea{min-height:100px;resize:vertical;border:0;font-size:1.1rem;padding:0}
+.mb label{font-size:.85rem;font-weight:600;color:var(--mute);display:block;margin-bottom:3px}
+.go{border:0;background:var(--blue);color:#fff;border-radius:6px;padding:10px;font-weight:700}
+.hint{font-size:.8rem;color:var(--mute);margin:0}
+@media(max-width:1100px){.layout{grid-template-columns:240px minmax(0,1fr)}.rside{display:none}}
+@media(max-width:800px){.layout{grid-template-columns:minmax(0,1fr);padding:12px 0}.lside{display:none}.card{border-radius:0}.search{display:none}.nav button{width:auto;flex:1}.nav{overflow-x:auto}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo" aria-hidden="true">RH</div>
+  <input class="search" id="q" type="search" placeholder="Buscar en el muro" aria-label="Buscar">
+  <nav class="nav" id="nav" aria-label="Secciones"></nav>
+  <div class="right">
+    <button class="pill" id="export" style="display:none" title="Descarga posts.json para subirlo a GitHub">Exportar</button>
+    <button class="pill" id="rhBtn">Modo RH</button>
+    <div class="me" id="meAv" aria-hidden="true">Tú</div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="lside"><nav class="menu" id="menu" aria-label="Filtrar"></nav></aside>
+  <main>
+    <section class="card compose" aria-label="Crear publicación">
+      <div class="r"><div class="av" style="--c:#1877f2">RH</div>
+      <button class="fake" id="open">¿Qué quieres compartir con el equipo?</button></div>
+      <hr>
+      <div class="shortcuts" id="short"></div>
+    </section>
+    <div id="feed" aria-live="polite"></div>
+  </main>
+  <aside class="rside">
+    <div class="card pad"><h3>🎂 Cumpleaños</h3><div id="bd"></div></div>
+    <div class="card pad"><h3>👋 Nuevos ingresos</h3><div id="nh"></div></div>
+  </aside>
+</div>
+
+<dialog id="dlg">
+  <div class="mh">Crear publicación<button id="close" aria-label="Cerrar">✕</button></div>
+  <div class="mb">
+    <div><label for="type">Tipo de publicación</label><select id="type"></select></div>
+    <div><label for="author">Publica como</label><input id="author" value="Recursos Humanos"></div>
+    <div><label for="title">Título</label><input id="title" maxlength="90" placeholder="Ej. Cambio de horario a partir del lunes"></div>
+    <textarea id="text" placeholder="¿Qué quieres compartir con el equipo?" aria-label="Mensaje"></textarea>
+    <div><label for="img">Flyer o imagen</label><input type="file" id="img" accept="image/*"></div>
+    <div><label for="vid">Video (enlace de YouTube, Vimeo o .mp4)</label><input id="vid" placeholder="https://"></div>
+    <p class="hint">Las imágenes se reducen automáticamente. Para videos pesados usa un enlace.</p>
+    <button class="go" id="publish">Publicar</button>
+  </div>
+</dialog>
+
+<script>
+/* ===== CONFIGURACIÓN: cambia esto ===== */
+const CONFIG={empresa:"Muro del equipo",pinRH:"1234"}; // PIN: protección básica, no segura
+/* ======================================= */
+
+const TYPES={
+ anuncio:{n:"Anuncios",i:"📢",c:"#d8e8ff",g:["#1877f2","#42a5f5"]},
+ horario:{n:"Horarios y administración",i:"🕒",c:"#ffe9c7",g:["#e08a00","#f5b84a"]},
+ cumple:{n:"Cumpleaños",i:"🎂",c:"#ffd9e6",g:["#f0457b","#ff9a8b"]},
+ ingreso:{n:"Nuevos ingresos",i:"👋",c:"#d4f5e3",g:["#1f9d6b","#5fd6a0"]},
+ flyer:{n:"Flyers",i:"🖼️",c:"#e8dcff",g:["#7a3fd1","#b08cf0"]},
+ video:{n:"Videos",i:"🎬",c:"#ffdfd0",g:["#c2410c","#f08a5d"]}
+};
+const COLORS=["#1877f2","#7a3fd1","#d6336c","#1f9d6b","#e08a00","#0e8fa8","#c2410c"];
+const SEEDS=[
+ {id:"s1",type:"ingreso",author:"Recursos Humanos",title:"Bienvenida a Mariana López",text:"Hoy se une al área de Finanzas. ¡Dale la bienvenida cuando la veas por la oficina!",date:Date.now()-36e5*3},
+ {id:"s2",type:"cumple",author:"Recursos Humanos",title:"¡Feliz cumpleaños, Carlos Ramírez!",text:"Todo el equipo te desea un gran día. Pasa por el pastel a las 4:00 pm.",date:Date.now()-36e5*20},
+ {id:"s3",type:"horario",author:"Administración",title:"Nuevo horario de comedor",text:"A partir del lunes el comedor abre de 1:00 a 3:30 pm.",date:Date.now()-36e5*50}
+];
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+ set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){alert("No hay espacio para guardar. Usa una imagen más pequeña.");return false}}};
+const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const col=s=>COLORS[[...String(s)].reduce((a,c)=>a+c.charCodeAt(0),0)%COLORS.length];
+
+let posts=[],filter="all",isRH=false,query="",likes=store.get("likes",{}),coms=store.get("coms",{}),openC={};
+
+async function load(){
+  let base=SEEDS;
+  try{const r=await fetch("posts.json",{cache:"no-store"});if(r.ok){const j=await r.json();if(Array.isArray(j))base=j}}catch(e){}
+  const local=store.get("posts",[]),ids=new Set(local.map(p=>p.id)),del=store.get("deleted",[]);
+  posts=[...local,...base.filter(p=>!ids.has(p.id))].filter(p=>!del.includes(p.id)).sort((a,b)=>b.date-a.date);
+  render();side();
+}
+function ago(t){const m=Math.floor((Date.now()-t)/6e4);if(m<1)return"Ahora";if(m<60)return`${m} min`;const h=Math.floor(m/60);if(h<24)return`${h} h`;
+  return new Date(t).toLocaleDateString("es-MX",{day:"numeric",month:"long"})}
+function embed(u){
+  u=(u||"").trim();if(!u)return"";
+  let m=u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/);
+  if(m)return`<iframe class="media" src="https://www.youtube.com/embed/${m[1]}" allowfullscreen title="Video"></iframe>`;
+  m=u.match(/vimeo\.com\/(\d+)/);
+  if(m)return`<iframe class="media" src="https://player.vimeo.com/video/${m[1]}" allowfullscreen title="Video"></iframe>`;
+  if(/^https?:\/\//.test(u))return`<video class="media" src="${esc(u)}" controls preload="metadata"></video>`;
+  return"";
+}
+function card(p){
+  const t=TYPES[p.type]||TYPES.anuncio,liked=!!likes[p.id],n=(p.likes||0)+(liked?1:0),cl=coms[p.id]||[];
+  const big=(p.type==="cumple"||p.type==="ingreso")&&!p.image&&!p.video?`<div class="big" style="--g1:${t.g[0]};--g2:${t.g[1]}"><span>${t.i}</span>${p.type==="cumple"?"¡Feliz cumpleaños!":"¡Bienvenido al equipo!"}</div>`:"";
+  const likeLbl=p.type==="cumple"?"🎉 Felicitar":p.type==="ingreso"?"👋 Dar la bienvenida":"👍 Me gusta";
+  return`<article class="card" id="${p.id}">
+  <div class="ph"><div class="av" style="--c:${col(p.author)}" aria-hidden="true">${esc((p.author||"R")[0])}</div>
+   <div class="w"><b>${esc(p.author)}</b><small>${t.i} ${t.n} · ${ago(p.date)} · 🌐</small></div>
+   <button class="dots" data-del="${p.id}" title="Eliminar publicación" aria-label="Eliminar publicación">🗑</button></div>
+  ${(p.title||p.text)?`<div class="pt">${p.title?`<strong>${esc(p.title)}</strong>`:""}${esc(p.text)}</div>`:""}
+  ${big}${p.image?`<img class="media" src="${p.image}" alt="${esc(p.title||"Imagen de la publicación")}">`:""}${embed(p.video)}
+  <div class="stats"><span>${n?`<span class="lk">👍</span>${n}`:""}</span><span>${cl.length?`${cl.length} comentario${cl.length>1?"s":""}`:""}</span></div>
+  <div class="act"><button data-like="${p.id}" class="${liked?"liked":""}" aria-pressed="${liked}">${likeLbl}</button>
+   <button data-com="${p.id}">💬 Comentar</button></div>
+  ${openC[p.id]||cl.length?`<div class="coms">${cl.map(c=>`<div class="com"><div class="av" style="--c:${col(c.n)}">${esc(c.n[0])}</div><div class="bub"><b>${esc(c.n)}</b>${esc(c.t)}</div></div>`).join("")}
+   <form class="ci" data-form="${p.id}"><input placeholder="Escribe un comentario…" aria-label="Comentario" required><button class="pill">Enviar</button></form></div>`:""}
+  </article>`;
+}
+function render(){
+  const q=query.toLowerCase();
+  const list=posts.filter(p=>(filter==="all"||p.type===filter)&&(!q||(p.title+" "+p.text+" "+p.author).toLowerCase().includes(q)));
+  $("#feed").innerHTML=list.length?list.map(card).join(""):`<div class="card empty">No hay publicaciones en esta sección.</div>`;
+}
+function side(){
+  const mk=ty=>{const l=posts.filter(p=>p.type===ty).slice(0,4);
+    return l.length?l.map(p=>`<div class="mini"><div class="ico" style="--c:${TYPES[ty].c}">${TYPES[ty].i}</div><div><b>${esc(p.title)}</b><small>${ago(p.date)}</small></div></div>`).join(""):`<small style="color:var(--mute)">Sin novedades</small>`};
+  $("#bd").innerHTML=mk("cumple");$("#nh").innerHTML=mk("ingreso");
+}
+function menus(){
+  const all=[["all","Inicio","🏠","#d8e8ff"],...Object.entries(TYPES).map(([k,v])=>[k,v.n,v.i,v.c])];
+  $("#menu").innerHTML=all.map(([k,n,i,c])=>`<button data-f="${k}" aria-pressed="${k===filter}"><span class="ico" style="--c:${c}">${i}</span>${n}</button>`).join("");
+  $("#nav").innerHTML=all.map(([k,n,i])=>`<button data-f="${k}" title="${n}" aria-label="${n}" aria-pressed="${k===filter}">${i}</button>`).join("");
+  $("#type").innerHTML=Object.entries(TYPES).map(([k,v])=>`<option value="${k}">${v.i} ${v.n}</option>`).join("");
+  $("#short").innerHTML=["flyer","video","cumple"].map(k=>`<button data-new="${k}">${TYPES[k].i} ${k==="flyer"?"Flyer":k==="video"?"Video":"Cumpleaños"}</button>`).join("");
+}
+document.addEventListener("click",e=>{
+  const f=e.target.closest("[data-f]");if(f){filter=f.dataset.f;menus();render();scrollTo(0,0);return}
+  const nw=e.target.closest("[data-new]");if(nw){$("#type").value=nw.dataset.new;$("#dlg").showModal();return}
+  const lk=e.target.closest("[data-like]");if(lk){const id=lk.dataset.like;likes[id]?delete likes[id]:likes[id]=1;store.set("likes",likes);render();return}
+  const cm=e.target.closest("[data-com]");if(cm){openC[cm.dataset.com]=true;render();document.querySelector(`#${cm.dataset.com} .ci input`)?.focus();return}
+  const d=e.target.closest("[data-del]");
+  if(d&&confirm("¿Eliminar esta publicación?")){const id=d.dataset.del;
+    store.set("posts",store.get("posts",[]).filter(p=>p.id!==id));store.set("deleted",[...store.get("deleted",[]),id]);
+    posts=posts.filter(p=>p.id!==id);render();side()}
+});
+document.addEventListener("submit",e=>{
+  const id=e.target.dataset.form;if(!id)return;e.preventDefault();
+  let n=store.get("nombre","");if(!n){n=(prompt("¿Cómo te llamas?")||"").trim();if(!n)return;store.set("nombre",n)}
+  const t=e.target.querySelector("input").value.trim();if(!t)return;
+  (coms[id]=coms[id]||[]).push({n,t});store.set("coms",coms);openC[id]=true;render();
+});
+$("#q").oninput=e=>{query=e.target.value;render()};
+$("#rhBtn").onclick=()=>{
+  if(!isRH){const pin=prompt("PIN de Recursos Humanos");if(pin!==CONFIG.pinRH){if(pin!==null)alert("PIN incorrecto");return}}
+  isRH=!isRH;document.body.classList.toggle("rh",isRH);
+  $("#rhBtn").classList.toggle("on",isRH);$("#rhBtn").textContent=isRH?"Salir de modo RH":"Modo RH";
+  $("#export").style.display=isRH?"":"none";
+};
+$("#open").onclick=()=>$("#dlg").showModal();
+$("#close").onclick=()=>$("#dlg").close();
+function shrink(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{
+  const s=Math.min(1,900/i.width),c=document.createElement("canvas");c.width=i.width*s;c.height=i.height*s;
+  c.getContext("2d").drawImage(i,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.75))};i.src=r.result};r.readAsDataURL(file)})}
+$("#publish").onclick=async()=>{
+  const title=$("#title").value.trim(),text=$("#text").value.trim(),video=$("#vid").value.trim(),f=$("#img").files[0];
+  if(!title&&!text&&!f&&!video){alert("Escribe un título o mensaje, o agrega una imagen o video.");return}
+  const p={id:"p"+Date.now(),type:$("#type").value,author:$("#author").value.trim()||"Recursos Humanos",title,text,video,date:Date.now()};
+  if(f)p.image=await shrink(f);
+  if(!store.set("posts",[p,...store.get("posts",[])]))return;
+  posts.unshift(p);["title","text","vid","img"].forEach(i=>$("#"+i).value="");
+  $("#dlg").close();render();side();
+};
+$("#export").onclick=()=>{const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(posts,null,1)],{type:"application/json"}));a.download="posts.json";a.click()};
+$("#meAv").textContent=(store.get("nombre","Tú")[0]||"T").toUpperCase();
+document.title=CONFIG.empresa;
+menus();load();
+</script>
+</body>
+</html>
